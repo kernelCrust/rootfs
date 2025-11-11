@@ -1,3 +1,6 @@
+CHECK_GIT_STATUS = git status -s | sed 's/"/|/g'
+# ################
+# HELP
 help:
 	@echo 'RUN USAGE: make {unshare.user, unshare.root, chroot.shell} [ROOT_DIR=<new_root>]'
 	@echo 'IMAGE USAGE: make {initrd, sqsh} [ROOT_DIR=<new_root>]'
@@ -37,7 +40,13 @@ savetogit: git.pushall
 git.pushall: git.commitall
 	@git push
 git.commitall: git.addall
-	@if [ -n "$(shell git status -s)" ] ; then git commit -m 'saving'; else echo '--- nothing to commit'; fi
+	@echo '--> COMMIT if STATUS allows..'
+	@if [ -n "$(shell $(CHECK_GIT_STATUS))" ]; \
+		then \
+			git commit -m 'saving'; \
+		else \
+			echo '--- nothing to commit'; \
+	fi
 git.addall:
 	@git add .
 
